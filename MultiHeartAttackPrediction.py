@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 
 import sklearn.metrics as mt
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, cross_val_predict
 
 from sklearn import preprocessing
 from sklearn.pipeline import make_pipeline
@@ -139,8 +139,9 @@ preprocess = make_pipeline(
 preprocess.set_output(transform='pandas')
 
 #Kulanmak istediğimiz modelleri hazırlayalım
-X = veriler.copy()
-y = X.pop("Result")
+X = tumVeri.copy()
+y = X.pop("Positive")
+print(tumVeri)
 
 models = {
     "AdaBoost": {
@@ -187,18 +188,19 @@ models = {
 
 #Hazırladığımızı modellerin eğitim işlemini gerçekleştirelim.
 for model in models:
-    print('----------------------------------')
+    print('\n----------------------------------')
     print(f'{model} is training...')
 
     model_pipeline = make_pipeline(preprocess, models[model]['model'])
     scores = cross_val_score(model_pipeline, X, y, cv=5, scoring='accuracy')
-    
+
+    print(cross_val_predict(model_pipeline, X, y, cv=5))
     models[model]['ACC'] = scores
 
 
 
 for model in models:
-    print('------------------------------------')
+    print('\n------------------------------------')
     print(f"{model}\nAccuracy CV 5: {models[model]['ACC']}\nAccuarcy Mean: {models[model]['ACC'].mean()}")
 
 plot_df = pd.DataFrame({'Model': [], 'ACC': []})
